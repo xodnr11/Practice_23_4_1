@@ -13,9 +13,11 @@ public class AccountService {
     private final AccountRepository accountRepository;
 
     public Long saveAccount(ReqSignUpDTO reqSignUpDTO) {
+
+
         Account account = Account.builder()
-                .name("test1")
-                .password("password1")
+                .name(reqSignUpDTO.getName())
+                .password(reqSignUpDTO.getPassword())
                 .build();
         accountRepository.save(account);
         return account.getId();

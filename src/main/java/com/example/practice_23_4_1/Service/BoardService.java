@@ -1,10 +1,12 @@
 package com.example.practice_23_4_1.Service;
 
-import com.example.practice_23_4_1.DTO.ReqBoardDTO;
+import com.example.practice_23_4_1.DTO.ReqPostDTO;
 import com.example.practice_23_4_1.Entity.Account;
 import com.example.practice_23_4_1.Entity.Board;
+import com.example.practice_23_4_1.Entity.Post;
 import com.example.practice_23_4_1.Repository.AccountRepository;
 import com.example.practice_23_4_1.Repository.BoardRepository;
+import com.example.practice_23_4_1.Repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,19 +14,36 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class BoardService {
 
-    private final BoardRepository boardRepository;
+    private final PostRepository postRepository;
     private final AccountRepository accountRepository;
+    private final BoardRepository boardRepository;
 
-    public Long savePost(ReqBoardDTO reqBoardDTO) {
+    public Long savePost(ReqPostDTO reqPostDTO) {
 
-        Board board = Board.builder()
-                .title(reqBoardDTO.getTitle())
-                .content(reqBoardDTO.getContent())
-                .account(accountRepository.findById(reqBoardDTO.getId()).get())
+        Account referenceById = accountRepository.getReferenceById(reqPostDTO.getId());
+/*        Post post = Post.builder()
+                .title(reqPostDTO.getTitle())
+                .content(reqPostDTO.getContent())
+                .account(accountRepository.findById(reqPostDTO.getId()).get())
+                .build();*/
+        Post post = Post.builder()
+                .title(reqPostDTO.getTitle())
+                .content(reqPostDTO.getContent())
+                .account(referenceById)
                 .build();
+        postRepository.save(post);
+        return post.getId();
+    }
 
-        boardRepository.save(board);
-        return board.getId();
+    public Post loadPost(Long postNum){
+        return postRepository.getReferenceById(postNum);
+    }
+
+    public Board resBoard(String BoardName) {
+
+        return boardRepository.findByBoardName(BoardName).orElseThrow(
+                ()->new IllegalArgumentException("게시판이 존재하지 않습니다.")
+        );
 
     }
 }
